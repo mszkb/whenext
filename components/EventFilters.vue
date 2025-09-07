@@ -52,6 +52,61 @@
             </button>
           </div>
 
+          <!-- Timezone Selector -->
+          <div class="flex items-center gap-2">
+            <Icon
+              name="heroicons:globe-alt"
+              :class="[
+                'h-4 w-4',
+                isLoadingTimezone ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'
+              ]"
+            />
+            <div class="relative">
+              <select
+                :value="selectedTimezone"
+                @change="$emit('timezone-change', $event.target.value)"
+                :disabled="isLoadingTimezone"
+                :class="[
+                  'filter-button appearance-none pr-8 text-sm',
+                  isLoadingTimezone ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-700' : ''
+                ]"
+              >
+                <option
+                  v-for="tz in commonTimezones"
+                  :key="tz.value"
+                  :value="tz.value"
+                >
+                  {{ tz.label }}
+                </option>
+              </select>
+              <Icon
+                name="heroicons:chevron-down"
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 pointer-events-none"
+                :class="isLoadingTimezone ? 'opacity-50' : ''"
+              />
+            </div>
+
+            <!-- Auto-detect button -->
+            <button
+              @click="$emit('auto-detect-timezone')"
+              :disabled="isLoadingTimezone"
+              :class="[
+                'filter-button p-2',
+                isAutoDetected && !isLoadingTimezone ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : '',
+                isLoadingTimezone ? 'bg-gray-100 dark:bg-gray-700 animate-pulse' : ''
+              ]"
+              :title="isLoadingTimezone ? 'Detecting timezone...' : isAutoDetected ? 'Auto-detected timezone' : 'Auto-detect timezone'"
+            >
+              <Icon
+                :name="isLoadingTimezone ? 'heroicons:arrow-path' : 'heroicons:map-pin'"
+                :class="[
+                  'h-4 w-4',
+                  isLoadingTimezone ? 'animate-spin' : ''
+                ]"
+              />
+            </button>
+          </div>
+
           <!-- Show Passed Events Toggle (only for main page) -->
           <div v-if="showPassedEventsToggle" class="flex justify-end">
             <label class="flex items-center space-x-2 cursor-pointer">
@@ -103,6 +158,35 @@ const props = defineProps({
   allLabel: {
     type: String,
     default: 'All Events'
+  },
+  selectedTimezone: {
+    type: String,
+    required: true
+  },
+  isLoadingTimezone: {
+    type: Boolean,
+    default: true
+  },
+  isAutoDetected: {
+    type: Boolean,
+    default: true
+  },
+  commonTimezones: {
+    type: Array,
+    default: () => [
+      { value: 'UTC', label: 'UTC' },
+      { value: 'America/New_York', label: 'Eastern Time' },
+      { value: 'America/Chicago', label: 'Central Time' },
+      { value: 'America/Denver', label: 'Mountain Time' },
+      { value: 'America/Los_Angeles', label: 'Pacific Time' },
+      { value: 'Europe/London', label: 'London' },
+      { value: 'Europe/Berlin', label: 'Berlin' },
+      { value: 'Europe/Paris', label: 'Paris' },
+      { value: 'Asia/Tokyo', label: 'Tokyo' },
+      { value: 'Asia/Shanghai', label: 'Shanghai' },
+      { value: 'Australia/Sydney', label: 'Sydney' },
+      { value: 'Pacific/Auckland', label: 'Auckland' }
+    ]
   }
 })
 
@@ -111,7 +195,9 @@ defineEmits([
   'category-change',
   'sort-change',
   'sort-direction-toggle',
-  'passed-events-toggle'
+  'passed-events-toggle',
+  'timezone-change',
+  'auto-detect-timezone'
 ])
 
 // Methods

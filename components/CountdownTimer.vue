@@ -65,6 +65,10 @@ const props = defineProps({
   event: {
     type: Object,
     required: true
+  },
+  timezone: {
+    type: String,
+    default: 'UTC'
   }
 })
 
@@ -116,46 +120,98 @@ const calculateTimeLeft = () => {
     timeLeft.value = newTimeLeft
   }
 
-  // Calculate progress percentage
+  // Calculate progress percentage with consistent rounding to avoid hydration mismatches
   const elapsed = totalDuration - difference
-  const newProgress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100))
+  const rawProgress = (elapsed / totalDuration) * 100
+  // Round to 4 decimal places to ensure consistency between server and client
+  const newProgress = Math.max(0, Math.min(100, Math.round(rawProgress * 10000) / 10000))
+
   if (progressPercentage.value !== newProgress) {
     progressPercentage.value = newProgress
   }
 }
 
-// Format event date for display
+// Format event date for display - ensure SSR and client consistency
 const formatEventDate = (dateStr) => {
   const date = new Date(dateStr)
-  return date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short'
-  })
+
+  // Use consistent timezone for both SSR and initial client render to avoid hydration mismatch
+  // We'll use a default timezone that works well globally (America/New_York is a good default)
+  const defaultTimezone = 'America/New_York'
+
+  try {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: process.client ? props.timezone : defaultTimezone,
+      timeZoneName: 'short'
+    })
+  } catch (error) {
+    console.warn('Error formatting event date:', error)
+    // Fallback without timezone
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 }
 
-// Format time ago for expired events
+// Format time ago for expired events - ensure SSR and client consistency
 const formatTimeAgo = (dateStr) => {
   const date = new Date(dateStr)
   const now = new Date()
-  const difference = now - date
-  
-  const days = Math.floor(difference / (1000 * 60 * 60 * 24))
-  const hours = Math.floor(difference / (1000 * 60 * 60))
-  const minutes = Math.floor(difference / (1000 * 60))
-  
-  if (days > 0) {
-    return `${days} day${days !== 1 ? 's' : ''} ago`
-  } else if (hours > 0) {
-    return `${hours} hour${hours !== 1 ? 's' : ''} ago`
-  } else if (minutes > 0) {
-    return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`
-  } else {
-    return 'just now'
+
+  // Use consistent timezone for both SSR and initial client render
+  const defaultTimezone = 'America/New_York'
+  const timezoneToUse = process.client ? props.timezone : defaultTimezone
+
+  try {
+    // Convert both dates to the consistent timezone for accurate calculation
+    const dateInTimezone = new Date(date.toLocaleString('en-US', { timeZone: timezoneToUse }))
+    const nowInTimezone = new Date(now.toLocaleString('en-US', { timeZone: timezoneToUse }))
+
+    const difference = nowInTimezone - dateInTimezone
+
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+    const hours = Math.floor(difference / (1000 * 60 * 60))
+    const minutes = Math.floor(difference / (1000 * 60))
+
+    if (days > 0) {
+      return `${days} day${days !== 1 ? 's' : ''} ago`
+    } else if (hours > 0) {
+      return `${hours} hour${hours !== 1 ? 's' : ''} ago`
+    } else if (minutes > 0) {
+      return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`
+    } else {
+      return 'just now'
+    }
+  } catch (error) {
+    console.warn('Error calculating time ago:', error)
+
+    // Fallback calculation without timezone conversion
+    const difference = now - date
+
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+    const hours = Math.floor(difference / (1000 * 60 * 60))
+    const minutes = Math.floor(difference / (1000 * 60))
+
+    if (days > 0) {
+      return `${days} day${days !== 1 ? 's' : ''} ago`
+    } else if (hours > 0) {
+      return `${hours} hour${hours !== 1 ? 's' : ''} ago`
+    } else if (minutes > 0) {
+      return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`
+    } else {
+      return 'just now'
+    }
   }
 }
 

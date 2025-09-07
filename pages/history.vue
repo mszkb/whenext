@@ -19,9 +19,15 @@
       :available-categories="availableCategories"
       :get-filtered-count="getFilteredCount"
       :all-label="'All Completed'"
+      :selected-timezone="selectedTimezone"
+      :is-loading-timezone="isLoadingTimezone"
+      :is-auto-detected="isAutoDetected"
+      :common-timezones="commonTimezones"
       @category-change="selectedCategory = $event"
       @sort-change="sortBy = $event"
       @sort-direction-toggle="toggleSortDirection"
+      @timezone-change="setTimezone($event)"
+      @auto-detect-timezone="autoDetectTimezone"
     />
 
     <!-- Events Grid -->
@@ -34,6 +40,7 @@
             :event="event"
             :index="index"
             :is-history-view="true"
+            :timezone="selectedTimezone"
           />
         </div>
 
@@ -54,6 +61,7 @@
 <script setup>
 import eventsData from '~/data/events.json'
 import { useEventFilters } from '~/composables/useEventFilters'
+import { useTimezone } from '~/composables/useTimezone'
 
 // SEO Meta
 useHead({
@@ -65,6 +73,22 @@ useHead({
 
 // Reactive data
 const events = ref(eventsData)
+
+// Use the timezone composable
+const {
+  selectedTimezone,
+  isLoadingTimezone,
+  isAutoDetected,
+  setTimezone,
+  autoDetectTimezone,
+  commonTimezones,
+  initializeTimezone
+} = useTimezone()
+
+// Initialize timezone detection on mount
+onMounted(() => {
+  initializeTimezone()
+})
 
 // Use the event filters composable for history (passed events only)
 const {

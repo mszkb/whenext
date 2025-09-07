@@ -41,7 +41,7 @@
 
     <!-- Countdown Timer -->
     <div class="mb-6">
-      <CountdownTimer :event="event" />
+      <CountdownTimer :event="event" :timezone="timezone" />
     </div>
 
     <!-- Status Section -->
@@ -102,6 +102,10 @@ const props = defineProps({
   isHistoryView: {
     type: Boolean,
     default: false
+  },
+  timezone: {
+    type: String,
+    default: 'UTC'
   }
 })
 
