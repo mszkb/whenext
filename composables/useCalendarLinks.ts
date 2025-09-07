@@ -32,7 +32,7 @@ export const useCalendarLinks = () => {
    * Get base URL for the application
    */
   const getBaseUrl = (): string => {
-    return config.public.siteUrl || 'https://whenext.app'
+    return config.public.siteUrl || 'https://www.whenext.de'
   }
 
   /**

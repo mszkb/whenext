@@ -5,7 +5,7 @@ import type { CalendarCategory } from '~/composables/useCalendarLinks'
 export class iCalGenerator {
   private baseUrl: string
 
-  constructor(baseUrl: string = 'https://whenext.app') {
+  constructor(baseUrl: string = 'https://www.whenext.de') {
     this.baseUrl = baseUrl
   }
 
@@ -164,7 +164,7 @@ export class iCalGenerator {
       parts.push(`\nMore info: ${event.source_url}`)
     }
 
-    parts.push(`\n\n📅 Tracked by Whenext - https://whenext.app`)
+    parts.push(`\n\n📅 Tracked by Whenext - https://www.whenext.de`)
 
     return parts.join('')
   }
@@ -310,7 +310,7 @@ export function createiCalGenerator(baseUrl?: string): iCalGenerator {
 export function generateQuickCalendar(
   events: CalendarEvent[], 
   category: CalendarCategory = 'alle',
-  baseUrl: string = 'https://whenext.app'
+  baseUrl: string = 'https://www.whenext.de'
 ): string {
   const generator = new iCalGenerator(baseUrl)
   return generator.generateCalendarFeed(events, category)

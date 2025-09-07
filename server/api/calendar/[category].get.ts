@@ -67,11 +67,11 @@ export default defineEventHandler(async (event) => {
           
           icalLines.push(
             'BEGIN:VEVENT',
-            `UID:${eventId}@whenext.app`,
+            `UID:${eventId}@whenext.de`,
             `DTSTART:${startTime}`,
             `DTEND:${endTime}`,
             `SUMMARY:${event.title}`,
-            `DESCRIPTION:${event.description || event.notes || ''}\\n\\nSource: ${event.source || ''}\\n\\nTracked by Whenext - https://whenext.app`,
+            `DESCRIPTION:${event.description || event.notes || ''}\\n\\nSource: ${event.source || ''}\\n\\nTracked by Whenext - https://www.whenext.de`,
             'STATUS:CONFIRMED',
             'TRANSP:OPAQUE',
             `CREATED:${now.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,

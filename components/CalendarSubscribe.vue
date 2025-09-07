@@ -194,7 +194,7 @@ const categoryName = computed(() => {
   return names[props.category] || `${props.category} Events`
 })
 
-const baseUrl = computed(() => config.public.siteUrl || 'https://whenext.app')
+const baseUrl = computed(() => config.public.siteUrl || 'https://www.whenext.de')
 
 const httpsUrl = computed(() => 
   `${baseUrl.value}/api/calendar/${props.category}.ics`

@@ -24,14 +24,14 @@ export default defineNuxtConfig({
         { property: 'og:title', content: 'Whenext - Multi Countdown App' },
         { property: 'og:description', content: 'Track upcoming events in tech, gaming, and entertainment with real-time countdowns and confidence scoring.' },
         { property: 'og:type', content: 'website' },
-        { property: 'og:url', content: 'https://whenext.app' },
-        { property: 'og:image', content: 'https://whenext.app/og-image.png' },
+        { property: 'og:url', content: 'https://www.whenext.de' },
+        { property: 'og:image', content: 'https://www.whenext.de/og-image.png' },
         
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'Whenext - Multi Countdown App' },
         { name: 'twitter:description', content: 'Track upcoming events in tech, gaming, and entertainment with real-time countdowns and confidence scoring.' },
-        { name: 'twitter:image', content: 'https://whenext.app/og-image.png' },
+        { name: 'twitter:image', content: 'https://www.whenext.de/og-image.png' },
         
         // Additional SEO
         { name: 'robots', content: 'index, follow' },
@@ -40,7 +40,7 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-        { rel: 'canonical', href: 'https://whenext.app' }
+        { rel: 'canonical', href: 'https://www.whenext.de' }
       ],
       script: [
         {
@@ -50,7 +50,7 @@ export default defineNuxtConfig({
             '@type': 'WebApplication',
             'name': 'Whenext',
             'description': 'Track upcoming events in tech, gaming, and entertainment with real-time countdowns and confidence scoring.',
-            'url': 'https://whenext.app',
+            'url': 'https://www.whenext.de',
             'applicationCategory': 'Utility',
             'operatingSystem': 'All',
             'offers': {
@@ -73,7 +73,7 @@ export default defineNuxtConfig({
   // Runtime config for environment variables
   runtimeConfig: {
     public: {
-      siteUrl: (typeof process !== 'undefined' ? process.env.NUXT_PUBLIC_SITE_URL : undefined) || 'https://whenext.app'
+      siteUrl: (typeof process !== 'undefined' ? process.env.NUXT_PUBLIC_SITE_URL : undefined) || 'https://www.whenext.de'
     }
   }
 })
