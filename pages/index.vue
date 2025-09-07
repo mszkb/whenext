@@ -1,177 +1,49 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white py-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-4xl md:text-6xl font-bold mb-6 text-shadow">
-          Never Miss What's <span class="text-yellow-300">Next</span>
-        </h1>
-        <p class="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
-          Track upcoming events in tech, gaming, and entertainment with real-time countdowns and confidence scoring.
-        </p>
-        <div class="flex justify-center items-center space-x-4 text-lg">
-          <Icon name="heroicons:clock" class="h-6 w-6" />
-          <span>{{ filteredEvents.length }} events tracked</span>
-        </div>
-      </div>
-    </section>
+    <HeroSection
+      description="Track upcoming events in tech, gaming, and entertainment with real-time countdowns and confidence scoring."
+      gradient="blue"
+      :stats="{
+        icon: 'heroicons:clock',
+        text: events.length + ' events tracked'
+      }"
+    />
 
     <!-- Filters Section -->
-    <section class="py-8 bg-white dark:bg-gray-800 shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col lg:flex-row justify-between items-center gap-6">
-          <!-- Category Filters -->
-          <div class="flex flex-wrap justify-center gap-4">
-            <button
-              @click="selectedCategory = 'all'"
-              :class="['filter-button', selectedCategory === 'all' ? 'filter-button-active' : '']"
-            >
-              <Icon name="heroicons:squares-2x2" class="h-4 w-4 mr-2" />
-              All Events ({{ getFilteredCount('all') }})
-            </button>
-            <button
-              v-for="category in availableCategories"
-              :key="category"
-              @click="selectedCategory = category"
-              :class="['filter-button', selectedCategory === category ? 'filter-button-active' : '']"
-            >
-              <Icon :name="getCategoryIcon(category)" class="h-4 w-4 mr-2" />
-              {{ capitalizeFirst(category) }} ({{ getFilteredCount(category) }})
-            </button>
-          </div>
-
-          <!-- Controls -->
-          <div class="flex items-center gap-4">
-            <!-- Show Passed Events Toggle -->
-            <label class="flex items-center space-x-2 cursor-pointer">
-              <input
-                v-model="showPassedEvents"
-                type="checkbox"
-                class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
-              />
-              <span class="text-sm text-gray-700 dark:text-gray-300">Show Passed Events</span>
-            </label>
-
-            <!-- Sort Controls -->
-            <div class="flex items-center gap-2">
-              <div class="relative">
-                <select
-                  v-model="sortBy"
-                  class="filter-button appearance-none pr-8"
-                >
-                  <option value="date">Sort by Date</option>
-                  <option value="category">Sort by Category</option>
-                  <option value="name">Sort by Name</option>
-                </select>
-                <Icon name="heroicons:chevron-down" class="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none" />
-              </div>
-
-              <!-- Sort Direction Toggle -->
-              <button
-                @click="toggleSortDirection"
-                class="filter-button p-2"
-                :title="sortDirection === 'asc' ? 'Sort Ascending' : 'Sort Descending'"
-              >
-                <Icon
-                  :name="sortDirection === 'asc' ? 'heroicons:arrow-up' : 'heroicons:arrow-down'"
-                  class="h-4 w-4"
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <EventFilters
+      :selected-category="selectedCategory"
+      :sort-by="sortBy"
+      :sort-direction="sortDirection"
+      :show-passed-events="showPassedEvents"
+      :show-passed-events-toggle="true"
+      :available-categories="availableCategories"
+      :get-filtered-count="getFilteredCount"
+      @category-change="selectedCategory = $event"
+      @sort-change="sortBy = $event"
+      @sort-direction-toggle="toggleSortDirection"
+      @passed-events-toggle="showPassedEvents = $event"
+    />
 
     <!-- Events Grid -->
     <section class="py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div
+          <EventCard
             v-for="(event, index) in filteredEvents"
             :key="event.id"
-            class="countdown-card"
-            :class="`animate-fade-in-up animation-delay-${index * 100}`"
-          >
-            <!-- Event Header -->
-            <div class="flex items-start justify-between mb-4">
-              <div class="flex items-center space-x-3">
-                <Icon :name="`heroicons:${event.icon}`" class="h-8 w-8 text-blue-600" />
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {{ event.title }}
-                  </h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ event.source }}
-                  </p>
-                </div>
-              </div>
-              <div class="flex flex-wrap gap-1">
-                <span
-                  v-for="category in parseCategories(event.category)"
-                  :key="category"
-                  :class="['category-badge', getCategoryClass(category)]"
-                >
-                  {{ category }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Event Description -->
-            <p class="text-gray-600 dark:text-gray-300 text-sm mb-6 leading-relaxed">
-              {{ event.description }}
-            </p>
-
-            <!-- Countdown Timer -->
-            <div class="mb-6">
-              <CountdownTimer :event="event" />
-            </div>
-
-            <!-- Confidence and Source -->
-            <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div v-if="!isEventExpired(event)" class="flex items-center space-x-2">
-                <span class="text-sm text-gray-500 dark:text-gray-400">Confidence:</span>
-                <span :class="getConfidenceBadgeClass(event.confidence)">
-                  {{ Math.round(event.confidence * 100) }}%
-                </span>
-              </div>
-              <div v-else class="flex items-center space-x-2">
-                <span class="text-sm text-gray-500 dark:text-gray-400">Event Status:</span>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                  Completed
-                </span>
-              </div>
-              <a
-                :href="event.source_url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium transition-colors"
-              >
-                View Source
-                <Icon name="heroicons:arrow-top-right-on-square" class="h-3 w-3 ml-1 inline" />
-              </a>
-            </div>
-
-            <!-- Additional Notes -->
-            <div v-if="event.notes" class="mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <p class="text-xs text-gray-600 dark:text-gray-400">
-                <Icon name="heroicons:information-circle" class="h-3 w-3 mr-1 inline" />
-                {{ event.notes }}
-              </p>
-            </div>
-          </div>
+            :event="event"
+            :index="index"
+            :is-history-view="false"
+          />
         </div>
 
         <!-- Empty State -->
-        <div v-if="filteredEvents.length === 0" class="text-center py-16">
-          <Icon name="heroicons:calendar-days" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            No events found
-          </h3>
-          <p class="text-gray-500 dark:text-gray-400">
-            Try adjusting your filter to see more events.
-          </p>
-        </div>
+        <EmptyState
+          v-if="filteredEvents.length === 0"
+          title="No events found"
+          description="Try adjusting your filter to see more events."
+        />
       </div>
     </section>
   </div>
@@ -210,55 +82,7 @@ const {
   defaultSortDirection: 'asc'
 })
 
-// Methods
-const getConfidenceBadgeClass = (confidence) => {
-  const classes = ['confidence-badge']
-  if (confidence >= 0.8) {
-    classes.push('confidence-high')
-  } else if (confidence >= 0.6) {
-    classes.push('confidence-medium')
-  } else {
-    classes.push('confidence-low')
-  }
-  return classes.join(' ')
-}
-
-// Get appropriate icon for category
-const getCategoryIcon = (category) => {
-  const iconMap = {
-    tech: 'heroicons:cpu-chip',
-    gaming: 'heroicons:puzzle-piece',
-    entertainment: 'heroicons:film',
-    ai: 'heroicons:bolt',
-    'e-sports': 'heroicons:trophy',
-    esports: 'heroicons:trophy',
-    streaming: 'heroicons:video-camera',
-    default: 'heroicons:tag'
-  }
-
-  return iconMap[category.toLowerCase()] || iconMap.default
-}
-
-// Get category class for styling
-const getCategoryClass = (category) => {
-  const classMap = {
-    tech: 'category-tech',
-    gaming: 'category-gaming',
-    entertainment: 'category-entertainment',
-    ai: 'category-ai',
-    'e-sports': 'category-e-sports',
-    esports: 'category-e-sports',
-    streaming: 'category-streaming',
-    default: 'category-default'
-  }
-
-  return classMap[category.toLowerCase()] || classMap.default
-}
-
-// Capitalize first letter of string
-const capitalizeFirst = (str) => {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
+// No additional methods needed - all logic is now in components
 
 
 // Schema.org structured data for events
@@ -293,19 +117,3 @@ useHead({
 })
 </script>
 
-<style scoped>
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
-}
-</style>

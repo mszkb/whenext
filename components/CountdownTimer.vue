@@ -79,32 +79,49 @@ const timeLeft = ref({
 const isExpired = ref(false)
 const progressPercentage = ref(0)
 
-// Calculate time remaining
-const calculateTimeLeft = () => {
-  const now = new Date().getTime()
-  const eventTime = new Date(props.event.event_date_iso).getTime()
-  const difference = eventTime - now
+// Reactive state for time calculations
+const eventTime = computed(() => new Date(props.event.event_date_iso).getTime())
+const totalDuration = 365 * 24 * 60 * 60 * 1000 // 1 year in milliseconds
 
+// Calculate time remaining with optimized calculations
+const calculateTimeLeft = () => {
+  const now = Date.now()
+  const difference = eventTime.value - now
+
+  // Immediate expiry detection for better responsiveness
   if (difference <= 0) {
-    isExpired.value = true
-    timeLeft.value = { days: 0, hours: 0, minutes: 0, seconds: 0 }
+    if (!isExpired.value) {
+      // Just expired - update immediately
+      isExpired.value = true
+      timeLeft.value = { days: 0, hours: 0, minutes: 0, seconds: 0 }
+      progressPercentage.value = 100
+    }
     return
   }
 
-  isExpired.value = false
-  
-  const days = Math.floor(difference / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-  const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+  // Only update if not expired
+  if (isExpired.value) {
+    isExpired.value = false
+  }
 
-  timeLeft.value = { days, hours, minutes, seconds }
+  // Calculate time components with optimized math
+  const days = Math.floor(difference / 86400000) // 1000 * 60 * 60 * 24
+  const hours = Math.floor((difference % 86400000) / 3600000) // 1000 * 60 * 60
+  const minutes = Math.floor((difference % 3600000) / 60000) // 1000 * 60
+  const seconds = Math.floor((difference % 60000) / 1000)
 
-  // Calculate progress (assuming events are tracked from when they're added)
-  // For demo purposes, we'll use a 365-day window
-  const totalDuration = 365 * 24 * 60 * 60 * 1000 // 1 year in milliseconds
+  // Only update if values have actually changed to reduce reactivity overhead
+  const newTimeLeft = { days, hours, minutes, seconds }
+  if (JSON.stringify(timeLeft.value) !== JSON.stringify(newTimeLeft)) {
+    timeLeft.value = newTimeLeft
+  }
+
+  // Calculate progress percentage
   const elapsed = totalDuration - difference
-  progressPercentage.value = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100))
+  const newProgress = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100))
+  if (progressPercentage.value !== newProgress) {
+    progressPercentage.value = newProgress
+  }
 }
 
 // Format event date for display
@@ -163,13 +180,40 @@ const getTimeRemainingText = () => {
   }
 }
 
-// Initialize and set up interval
-onMounted(() => {
+// Timer state
+let animationFrameId = null
+let intervalId = null
+
+// High-frequency update function using requestAnimationFrame
+const updateTimer = () => {
   calculateTimeLeft()
-  const interval = setInterval(calculateTimeLeft, 1000)
-  
+  animationFrameId = requestAnimationFrame(updateTimer)
+}
+
+// Fallback interval for browsers without requestAnimationFrame support
+const startFallbackTimer = () => {
+  intervalId = setInterval(calculateTimeLeft, 100) // 100ms for smooth updates
+}
+
+// Initialize countdown data immediately for SSR compatibility
+calculateTimeLeft()
+
+// Initialize and set up timer
+onMounted(() => {
+  // Start the continuous timer updates for client-side interactivity
+  if (typeof requestAnimationFrame !== 'undefined') {
+    updateTimer()
+  } else {
+    startFallbackTimer()
+  }
+
   onUnmounted(() => {
-    clearInterval(interval)
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId)
+    }
+    if (intervalId) {
+      clearInterval(intervalId)
+    }
   })
 })
 </script>

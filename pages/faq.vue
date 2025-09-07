@@ -1,16 +1,12 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-16">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-4xl md:text-5xl font-bold mb-6">
-          Frequently Asked Questions
-        </h1>
-        <p class="text-xl text-indigo-100 max-w-2xl mx-auto">
-          Everything you need to know about Whenext and how our countdown system works.
-        </p>
-      </div>
-    </section>
+    <HeroSection
+      title="Frequently Asked Questions"
+      description="Everything you need to know about Whenext and how our countdown system works."
+      gradient="purple"
+      size="medium"
+    />
 
     <!-- FAQ Content -->
     <section class="py-16">
