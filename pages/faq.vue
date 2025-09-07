@@ -41,20 +41,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Contact Section -->
-        <div class="mt-16 text-center bg-gray-50 dark:bg-gray-800 rounded-2xl p-8">
-          <Icon name="heroicons:chat-bubble-left-right" class="h-12 w-12 text-blue-600 mx-auto mb-4" />
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Still have questions?
-          </h2>
-          <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-2xl mx-auto">
-            We're here to help! If you can't find the answer you're looking for, feel free to reach out to us.
-          </p>
-          <UButton size="lg" class="bg-blue-600 hover:bg-blue-700">
-            Contact Support
-          </UButton>
-        </div>
       </div>
     </section>
   </div>
@@ -68,7 +54,6 @@ useHead({
     { name: 'description', content: 'Frequently asked questions about Whenext countdown app, including how our confidence scoring works and where our data comes from.' }
   ]
 })
-
 // Reactive data
 const openFAQs = ref([])
 

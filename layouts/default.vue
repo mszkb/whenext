@@ -95,11 +95,6 @@
                   FAQ
                 </NuxtLink>
               </li>
-              <li>
-                <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Contact
-                </a>
-              </li>
             </ul>
           </div>
           
