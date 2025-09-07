@@ -1,0 +1,25 @@
+{
+  "name": "Whenext - Multi Countdown App",
+  "short_name": "Whenext",
+  "description": "Track upcoming events in tech, gaming, and entertainment with real-time countdowns and confidence scoring.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["productivity", "utilities", "entertainment"],
+  "lang": "en",
+  "dir": "ltr"
+}

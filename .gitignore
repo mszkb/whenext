@@ -1,0 +1,51 @@
+# Nuxt.js build output
+.nuxt/
+dist/
+output/
+
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.*.local
+
+# Local runtime files
+*.local
+*.sublime-workspace
+
+# Mac system files
+.DS_Store
+
+# VSCode settings
+.vscode/
+
+# IDE files
+.idea/
+*.swp
+
+# Coverage reports
+coverage/
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# Nuxt generate output
+generate/
+
+# Static hosting output (if used)
+out/
+
+# Lock files (optional, if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
