@@ -20,6 +20,7 @@
     "vue": "latest"
   },
   "devDependencies": {
+    "@iconify-json/simple-icons": "^1.2.50",
     "@nuxt/eslint": "^0.5.7",
     "@types/node": "^22.0.0"
   }

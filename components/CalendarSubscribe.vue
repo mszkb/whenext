@@ -42,18 +42,40 @@
             <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
               Click the button below to automatically open your default calendar app
             </p>
-            <a
-              :href="webcalUrl"
-              class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-              @click="trackSubscription('webcal')"
+            <button
+              @click="handleOneClickSubscribe"
+              :class="[
+                'inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors',
+                subscribeSuccess 
+                  ? 'bg-green-600 hover:bg-green-700 text-white' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white',
+                { 'opacity-75 cursor-not-allowed': isSubscribing }
+              ]"
+              :disabled="isSubscribing"
             >
-              <Icon name="heroicons:plus" class="h-4 w-4 mr-2" />
-              Subscribe in Calendar App
-            </a>
+              <Icon 
+                :name="subscribeSuccess ? 'heroicons:check' : isSubscribing ? 'heroicons:arrow-path' : 'heroicons:plus'" 
+                :class="['h-4 w-4 mr-2', { 'animate-spin': isSubscribing }]" 
+              />
+              {{ 
+                subscribeSuccess 
+                  ? 'Calendar Opened!' 
+                  : isSubscribing 
+                    ? 'Opening Calendar...' 
+                    : 'Subscribe in Calendar App' 
+              }}
+            </button>
+            
+            <!-- Success Message -->
+            <div v-if="subscribeSuccess" class="mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <p class="text-sm text-green-700 dark:text-green-300">
+                ✅ Your calendar app should have opened. If not, please use the manual links below.
+              </p>
+            </div>
           </div>
 
           <!-- Manual Links -->
-          <div class="space-y-3">
+          <div class="space-y-3" data-manual-links>
             <h4 class="font-medium text-gray-900 dark:text-gray-100 flex items-center">
               <Icon name="heroicons:link" class="h-5 w-5 mr-2 text-gray-600" />
               Copy Links Manually
@@ -173,6 +195,8 @@ const config = useRuntimeConfig()
 
 // Reactive state
 const isModalOpen = ref(false)
+const isSubscribing = ref(false)
+const subscribeSuccess = ref(false)
 const copiedStates = ref({
   webcal: false,
   https: false
@@ -245,6 +269,120 @@ const calendarApps = computed(() => [
 ])
 
 // Methods
+const handleOneClickSubscribe = async () => {
+  if (isSubscribing.value) return
+  
+  isSubscribing.value = true
+  
+  try {
+    // Track the subscription attempt
+    trackSubscription('one-click-webcal')
+    
+    // Get the webcal URL
+    const webcalLink = webcalUrl.value
+    
+    // Detect platform for better user experience
+    const platform = detectPlatform()
+    
+    if (platform === 'ios' || platform === 'macos') {
+      // For iOS/macOS, webcal:// URLs work directly
+      window.location.href = webcalLink
+    } else if (platform === 'android') {
+      // For Android, try Google Calendar integration first
+      const googleCalendarUrl = `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(httpsUrl.value)}`
+      
+      // Try to open Google Calendar, fallback to webcal
+      const popup = window.open(googleCalendarUrl, '_blank', 'width=800,height=600')
+      
+      // If popup is blocked or doesn't work, fallback to webcal
+      if (!popup || popup.closed) {
+        window.location.href = webcalLink
+      }
+      
+      // Close popup after a short delay if it opened successfully
+      setTimeout(() => {
+        if (popup && !popup.closed) {
+          popup.close()
+        }
+      }, 3000)
+      
+    } else {
+      // For desktop browsers, try webcal first
+      try {
+        // Create a hidden link and click it to trigger the webcal handler
+        const link = document.createElement('a')
+        link.href = webcalLink
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        
+        // If webcal doesn't work (no handler registered), show fallback after delay
+        setTimeout(() => {
+          showFallbackOptions()
+        }, 2000)
+        
+      } catch (error) {
+        console.error('Webcal subscription failed:', error)
+        showFallbackOptions()
+      }
+    }
+    
+    // Show success message after a short delay
+    setTimeout(() => {
+      isSubscribing.value = false
+      subscribeSuccess.value = true
+      
+      // Reset success state after 5 seconds
+      setTimeout(() => {
+        subscribeSuccess.value = false
+      }, 5000)
+    }, 1500)
+    
+  } catch (error) {
+    console.error('One-click subscribe failed:', error)
+    isSubscribing.value = false
+    showFallbackOptions()
+  }
+}
+
+const detectPlatform = (): string => {
+  const userAgent = navigator.userAgent.toLowerCase()
+  
+  if (/iphone|ipad|ipod/.test(userAgent)) {
+    return 'ios'
+  } else if (/android/.test(userAgent)) {
+    return 'android'
+  } else if (/mac/.test(userAgent) && !(/iphone|ipad|ipod/.test(userAgent))) {
+    return 'macos'
+  } else if (/win/.test(userAgent)) {
+    return 'windows'
+  } else if (/linux/.test(userAgent)) {
+    return 'linux'
+  }
+  return 'unknown'
+}
+
+const showFallbackOptions = () => {
+  // Show a toast or notification with manual instructions
+  const platform = detectPlatform()
+  let message = 'Calendar app not found. Please copy the link below manually.'
+  
+  if (platform === 'windows') {
+    message = 'Please copy the HTTPS URL and add it to your Outlook calendar.'
+  } else if (platform === 'android') {
+    message = 'Please copy the HTTPS URL and add it to Google Calendar.'
+  }
+  
+  console.log('Fallback:', message)
+  
+  // Auto-scroll to manual links section
+  const manualSection = document.querySelector('[data-manual-links]')
+  if (manualSection) {
+    manualSection.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}
+
 const copyToClipboard = async (text: string, type: 'webcal' | 'https') => {
   try {
     await navigator.clipboard.writeText(text)
@@ -275,11 +413,13 @@ const trackSubscription = (method: string) => {
   // })
 }
 
-// Clean up copied states when modal closes
+// Clean up states when modal closes
 watch(isModalOpen, (isOpen: boolean) => {
   if (!isOpen) {
     copiedStates.value.webcal = false
     copiedStates.value.https = false
+    subscribeSuccess.value = false
+    isSubscribing.value = false
   }
 })
 </script>
