@@ -13,8 +13,9 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@nuxt/ui": "^2.18.4",
     "@nuxt/icon": "^1.5.1",
+    "@nuxt/ui": "^2.18.4",
+    "ical-generator": "^9.0.0",
     "nuxt": "^3.13.0",
     "vue": "latest"
   },

@@ -24,6 +24,13 @@
 
         <!-- Controls -->
         <div class="flex flex-col gap-4">
+          <!-- Calendar Subscribe Button -->
+          <div class="flex justify-center lg:justify-end">
+            <CalendarSubscribe 
+              :category="selectedCategory === 'all' ? 'alle' : selectedCategory" 
+            />
+          </div>
+          
           <!-- Sort Controls -->
           <div class="flex items-center gap-2">
             <div class="relative">
