@@ -6,16 +6,19 @@
       isHistoryView ? 'opacity-75' : ''
     ]"
   >
+    <div class="flex items-start justify-end mb-4">
+      <div class="flex flex-wrap gap-1">
+        <CategoryBadge
+          v-for="category in parseCategories(event.category)"
+          :key="category"
+          :category="category"
+        />
+      </div>
+    </div>
+    
     <!-- Event Header -->
     <div class="flex items-start justify-between mb-4">
       <div class="flex items-center space-x-3">
-        <Icon
-          :name="`heroicons:${event.icon}`"
-          :class="[
-            'h-8 w-8',
-            isHistoryView ? 'text-gray-500' : 'text-blue-600'
-          ]"
-        />
         <div>
           <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {{ event.title }}
@@ -25,13 +28,7 @@
           </p>
         </div>
       </div>
-      <div class="flex flex-wrap gap-1">
-        <CategoryBadge
-          v-for="category in parseCategories(event.category)"
-          :key="category"
-          :category="category"
-        />
-      </div>
+      
     </div>
 
     <!-- Event Description -->
