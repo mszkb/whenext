@@ -42,7 +42,7 @@
   }
   
   .category-badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap;
   }
   
   .category-tech {
@@ -55,6 +55,23 @@
   
   .category-entertainment {
     @apply bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200;
+  }
+
+  .category-ai {
+    @apply bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200;
+  }
+
+  .category-e-sports,
+  .category-esports {
+    @apply bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200;
+  }
+
+  .category-streaming {
+    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
+  }
+
+  .category-default {
+    @apply bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200;
   }
   
   .filter-button {

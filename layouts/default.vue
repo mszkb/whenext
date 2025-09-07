@@ -12,15 +12,22 @@
           
           <!-- Navigation Links -->
           <div class="flex items-center space-x-6">
-            <NuxtLink 
-              to="/" 
+            <NuxtLink
+              to="/"
               class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               :class="{ 'text-blue-600 dark:text-blue-400 font-medium': $route.path === '/' }"
             >
               Countdowns
             </NuxtLink>
-            <NuxtLink 
-              to="/faq" 
+            <NuxtLink
+              to="/history"
+              class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              :class="{ 'text-blue-600 dark:text-blue-400 font-medium': $route.path === '/history' }"
+            >
+              History
+            </NuxtLink>
+            <NuxtLink
+              to="/faq"
               class="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               :class="{ 'text-blue-600 dark:text-blue-400 font-medium': $route.path === '/faq' }"
             >
@@ -72,6 +79,11 @@
               <li>
                 <NuxtLink to="/" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   All Countdowns
+                </NuxtLink>
+              </li>
+              <li>
+                <NuxtLink to="/history" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Event History
                 </NuxtLink>
               </li>
               <li>

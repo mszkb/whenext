@@ -1,17 +1,17 @@
 <template>
   <div>
     <!-- Hero Section -->
-    <section class="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white py-20">
+    <section class="bg-gradient-to-br from-gray-600 via-slate-600 to-zinc-600 text-white py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-4xl md:text-6xl font-bold mb-6 text-shadow">
-          Never Miss What's <span class="text-yellow-300">Next</span>
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">
+          Event History
         </h1>
-        <p class="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
-          Track upcoming events in tech, gaming, and entertainment with real-time countdowns and confidence scoring.
+        <p class="text-xl text-gray-200 max-w-2xl mx-auto">
+          Browse all completed events and see what you've missed.
         </p>
-        <div class="flex justify-center items-center space-x-4 text-lg">
+        <div class="flex justify-center items-center space-x-4 mt-6 text-lg">
           <Icon name="heroicons:clock" class="h-6 w-6" />
-          <span>{{ filteredEvents.length }} events tracked</span>
+          <span>{{ totalPassedEvents }} completed events</span>
         </div>
       </div>
     </section>
@@ -27,7 +27,7 @@
               :class="['filter-button', selectedCategory === 'all' ? 'filter-button-active' : '']"
             >
               <Icon name="heroicons:squares-2x2" class="h-4 w-4 mr-2" />
-              All Events ({{ getFilteredCount('all') }})
+              All Completed ({{ getFilteredCount('all') }})
             </button>
             <button
               v-for="category in availableCategories"
@@ -40,44 +40,31 @@
             </button>
           </div>
 
-          <!-- Controls -->
-          <div class="flex items-center gap-4">
-            <!-- Show Passed Events Toggle -->
-            <label class="flex items-center space-x-2 cursor-pointer">
-              <input
-                v-model="showPassedEvents"
-                type="checkbox"
-                class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
-              />
-              <span class="text-sm text-gray-700 dark:text-gray-300">Show Passed Events</span>
-            </label>
-
-            <!-- Sort Controls -->
-            <div class="flex items-center gap-2">
-              <div class="relative">
-                <select
-                  v-model="sortBy"
-                  class="filter-button appearance-none pr-8"
-                >
-                  <option value="date">Sort by Date</option>
-                  <option value="category">Sort by Category</option>
-                  <option value="name">Sort by Name</option>
-                </select>
-                <Icon name="heroicons:chevron-down" class="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none" />
-              </div>
-
-              <!-- Sort Direction Toggle -->
-              <button
-                @click="toggleSortDirection"
-                class="filter-button p-2"
-                :title="sortDirection === 'asc' ? 'Sort Ascending' : 'Sort Descending'"
+          <!-- Sort Controls -->
+          <div class="flex items-center gap-2">
+            <div class="relative">
+              <select
+                v-model="sortBy"
+                class="filter-button appearance-none pr-8"
               >
-                <Icon
-                  :name="sortDirection === 'asc' ? 'heroicons:arrow-up' : 'heroicons:arrow-down'"
-                  class="h-4 w-4"
-                />
-              </button>
+                <option value="date">Sort by Date</option>
+                <option value="category">Sort by Category</option>
+                <option value="name">Sort by Name</option>
+              </select>
+              <Icon name="heroicons:chevron-down" class="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none" />
             </div>
+
+            <!-- Sort Direction Toggle -->
+            <button
+              @click="toggleSortDirection"
+              class="filter-button p-2"
+              :title="sortDirection === 'asc' ? 'Sort Ascending' : 'Sort Descending'"
+            >
+              <Icon
+                :name="sortDirection === 'asc' ? 'heroicons:arrow-up' : 'heroicons:arrow-down'"
+                class="h-4 w-4"
+              />
+            </button>
           </div>
         </div>
       </div>
@@ -90,13 +77,13 @@
           <div
             v-for="(event, index) in filteredEvents"
             :key="event.id"
-            class="countdown-card"
+            class="countdown-card opacity-75"
             :class="`animate-fade-in-up animation-delay-${index * 100}`"
           >
             <!-- Event Header -->
             <div class="flex items-start justify-between mb-4">
               <div class="flex items-center space-x-3">
-                <Icon :name="`heroicons:${event.icon}`" class="h-8 w-8 text-blue-600" />
+                <Icon :name="`heroicons:${event.icon}`" class="h-8 w-8 text-gray-500" />
                 <div>
                   <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     {{ event.title }}
@@ -122,22 +109,16 @@
               {{ event.description }}
             </p>
 
-            <!-- Countdown Timer -->
+            <!-- Event Details -->
             <div class="mb-6">
               <CountdownTimer :event="event" />
             </div>
 
-            <!-- Confidence and Source -->
+            <!-- Event Status -->
             <div class="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div v-if="!isEventExpired(event)" class="flex items-center space-x-2">
-                <span class="text-sm text-gray-500 dark:text-gray-400">Confidence:</span>
-                <span :class="getConfidenceBadgeClass(event.confidence)">
-                  {{ Math.round(event.confidence * 100) }}%
-                </span>
-              </div>
-              <div v-else class="flex items-center space-x-2">
-                <span class="text-sm text-gray-500 dark:text-gray-400">Event Status:</span>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+              <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Status:</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                   Completed
                 </span>
               </div>
@@ -166,11 +147,18 @@
         <div v-if="filteredEvents.length === 0" class="text-center py-16">
           <Icon name="heroicons:calendar-days" class="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            No events found
+            No completed events found
           </h3>
-          <p class="text-gray-500 dark:text-gray-400">
-            Try adjusting your filter to see more events.
+          <p class="text-gray-500 dark:text-gray-400 mb-4">
+            Try adjusting your filter or check back later for completed events.
           </p>
+          <NuxtLink
+            to="/"
+            class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Icon name="heroicons:arrow-left" class="h-4 w-4 mr-2" />
+            Back to Upcoming Events
+          </NuxtLink>
         </div>
       </div>
     </section>
@@ -183,21 +171,20 @@ import { useEventFilters } from '~/composables/useEventFilters'
 
 // SEO Meta
 useHead({
-  title: 'Whenext - Multi Countdown App',
+  title: 'Event History - Whenext',
   meta: [
-    { name: 'description', content: 'Track upcoming events in tech, gaming, and entertainment with real-time countdowns and confidence scoring.' }
+    { name: 'description', content: 'Browse all completed events and see what you\'ve missed in tech, gaming, and entertainment.' }
   ]
 })
 
 // Reactive data
 const events = ref(eventsData)
 
-// Use the event filters composable
+// Use the event filters composable for history (passed events only)
 const {
   selectedCategory,
   sortBy,
   sortDirection,
-  showPassedEvents,
   filteredEvents,
   availableCategories,
   getFilteredCount,
@@ -205,24 +192,17 @@ const {
   isEventExpired,
   toggleSortDirection
 } = useEventFilters(events, {
-  showPassedEvents: false,
   defaultSortBy: 'date',
-  defaultSortDirection: 'asc'
+  defaultSortDirection: 'desc', // Newest first for history
+  filterPassedOnly: true // Only show passed events
+})
+
+// Computed property for total passed events count
+const totalPassedEvents = computed(() => {
+  return events.value.filter(event => isEventExpired(event)).length
 })
 
 // Methods
-const getConfidenceBadgeClass = (confidence) => {
-  const classes = ['confidence-badge']
-  if (confidence >= 0.8) {
-    classes.push('confidence-high')
-  } else if (confidence >= 0.6) {
-    classes.push('confidence-medium')
-  } else {
-    classes.push('confidence-low')
-  }
-  return classes.join(' ')
-}
-
 // Get appropriate icon for category
 const getCategoryIcon = (category) => {
   const iconMap = {
@@ -259,41 +239,13 @@ const getCategoryClass = (category) => {
 const capitalizeFirst = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
-
-
-// Schema.org structured data for events
-useHead({
-  script: [
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'ItemList',
-        'name': 'Upcoming Events Countdown',
-        'description': 'Track upcoming events in tech, gaming, and entertainment',
-        'numberOfItems': events.value.length,
-        'itemListElement': events.value.map((event, index) => ({
-          '@type': 'Event',
-          'position': index + 1,
-          'name': event.title,
-          'description': event.description,
-          'startDate': event.event_date_iso,
-          'organizer': {
-            '@type': 'Organization',
-            'name': event.source,
-            'url': event.source_url
-          },
-          'eventStatus': 'https://schema.org/EventScheduled',
-          'eventAttendanceMode': 'https://schema.org/MixedEventAttendanceMode',
-          'url': event.source_url
-        }))
-      })
-    }
-  ]
-})
 </script>
 
 <style scoped>
+.countdown-card {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1;
+}
+
 @keyframes fade-in-up {
   from {
     opacity: 0;

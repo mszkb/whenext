@@ -12,4 +12,10 @@
     <priority>0.80</priority>
     <changefreq>weekly</changefreq>
   </url>
+  <url>
+    <loc>https://whenext.app/history</loc>
+    <lastmod>2024-01-01T00:00:00+00:00</lastmod>
+    <priority>0.70</priority>
+    <changefreq>daily</changefreq>
+  </url>
 </urlset>

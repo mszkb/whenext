@@ -5,9 +5,15 @@ A modern, SEO-friendly multi-countdown application built with Nuxt.js that track
 ## Features
 
 - **Real-time Countdowns**: Live updating countdown timers for multiple events
-- **Category Filtering**: Filter events by Tech, Gaming, and Entertainment
-- **Confidence Scoring**: Each event includes a reliability score
+- **Dynamic Category Filtering**: Automatically detects and filters by all categories in your data
+- **Passed Events Toggle**: Show or hide completed events
+- **Event History Page**: Dedicated page showing only completed events
+- **Multiple Sorting Options**: Sort by date, category, or name with ASC/DESC direction
+- **Confidence Scoring**: Each event includes a reliability score (only for upcoming events)
 - **SEO Optimized**: Full Schema.org markup for Google Gemini searchability
+- **Multiple Category Support**: Events can have multiple categories (e.g., "gaming/entertainment")
+- **Smart Category Icons**: Automatic icon assignment based on category type
+- **Category Color Coding**: Distinct colors for AI, E-sports, and other categories
 - **Responsive Design**: Works perfectly on desktop and mobile devices
 - **FAQ Section**: Comprehensive explanation of how the app works
 
@@ -17,6 +23,7 @@ A modern, SEO-friendly multi-countdown application built with Nuxt.js that track
 - **Styling**: Tailwind CSS with custom components
 - **Icons**: Heroicons via @nuxt/icon
 - **Data**: JSON-based event storage
+- **Composables**: Reusable Vue composition functions
 - **SEO**: Schema.org structured data
 
 ## Project Structure
@@ -24,10 +31,13 @@ A modern, SEO-friendly multi-countdown application built with Nuxt.js that track
 ```
 whenext-app/
 ├── assets/css/main.css          # Custom styles
+├── composables/
+│   └── useEventFilters.ts      # Reusable event filtering logic
 ├── data/events.json            # Event data source
 ├── layouts/default.vue         # Main layout with navigation
 ├── pages/
 │   ├── index.vue              # Homepage with countdowns
+│   ├── history.vue            # Event history page
 │   └── faq.vue                # FAQ page
 ├── public/
 │   ├── robots.txt             # SEO robots file
