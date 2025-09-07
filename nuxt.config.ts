@@ -67,7 +67,15 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       routes: ['/sitemap.xml', '/robots.txt']
-    }
+    },
+    // Copy events data to output directory for production
+    publicAssets: [
+      {
+        baseURL: '/data',
+        dir: 'data',
+        maxAge: 60 * 60 * 24 // Cache for 1 day
+      }
+    ]
   },
   
   // Runtime config for environment variables

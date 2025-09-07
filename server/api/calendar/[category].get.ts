@@ -23,15 +23,74 @@ export default defineEventHandler(async (event) => {
     // Load events data
     let events: any[]
     try {
-      // Load from data/events.json
-      const dataPath = join(process.cwd(), 'data', 'events.json')
-      const eventsData = readFileSync(dataPath, 'utf-8')
-      events = JSON.parse(eventsData)
+      // Try multiple possible paths for the events data
+      let eventsData: string
+      let dataPath: string
+      
+      // In production, try the public folder first
+      const publicPath = join(process.cwd(), 'public', 'data', 'events.json')
+      const dataFolderPath = join(process.cwd(), 'data', 'events.json')
+      const nitroPath = join(process.cwd(), '.output', 'public', 'data', 'events.json')
+      
+      try {
+        eventsData = readFileSync(publicPath, 'utf-8')
+        dataPath = publicPath
+      } catch {
+        try {
+          eventsData = readFileSync(dataFolderPath, 'utf-8')
+          dataPath = dataFolderPath
+        } catch {
+          try {
+            eventsData = readFileSync(nitroPath, 'utf-8')
+            dataPath = nitroPath
+          } catch {
+            // If all file paths fail, try to fetch via HTTP as last resort
+            try {
+              const config = useRuntimeConfig()
+              const baseUrl = config.public.siteUrl || 'https://www.whenext.de'
+              const response = await fetch(`${baseUrl}/data/events.json`)
+              if (response.ok) {
+                const fetchedData = await response.json()
+                events = fetchedData
+                console.log('Loaded events data via HTTP fetch')
+              } else {
+                throw new Error(`HTTP fetch failed with status: ${response.status}`)
+              }
+            } catch (fetchError) {
+              // Final fallback: try to import the data directly
+              const eventsModule = await import('~/data/events.json').catch(() => null)
+              if (eventsModule && eventsModule.default) {
+                events = eventsModule.default
+                console.log('Loaded events data via import')
+              } else {
+                throw new Error('No events data found in any location')
+              }
+            }
+          }
+        }
+      }
+      
+      if (!events && eventsData) {
+        events = JSON.parse(eventsData)
+        console.log(`Loaded events data from: ${dataPath}`)
+      }
+      
+      if (!events || !Array.isArray(events)) {
+        throw new Error('Events data is not a valid array')
+      }
+      
     } catch (dataError) {
       console.error('Failed to load events data:', dataError)
+      console.error('Current working directory:', process.cwd())
+      console.error('Attempted paths:', [
+        join(process.cwd(), 'public', 'data', 'events.json'),
+        join(process.cwd(), 'data', 'events.json'),
+        join(process.cwd(), '.output', 'public', 'data', 'events.json')
+      ])
+      
       throw createError({
         statusCode: 500,
-        statusMessage: 'Failed to load events data'
+        statusMessage: `Failed to load events data: ${dataError.message || dataError}`
       })
     }
 
