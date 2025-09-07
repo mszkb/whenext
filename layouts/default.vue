@@ -8,6 +8,10 @@
           <NuxtLink to="/" class="flex items-center space-x-2">
             <Icon name="heroicons:clock" class="h-8 w-8 text-blue-600" />
             <span class="text-xl font-bold gradient-text">Whenext</span>
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 ml-2">
+              <Icon name="heroicons:wrench-screwdriver" class="h-3 w-3 mr-1" />
+              Work in Progress
+            </span>
           </NuxtLink>
           
           <!-- Navigation Links -->
@@ -110,8 +114,16 @@
           </div>
         </div>
         
-        <!-- Copyright -->
+        <!-- Disclaimer -->
         <div class="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center">
+          <p class="text-gray-500 dark:text-gray-400 text-xs mb-4">
+            <strong>Disclaimer:</strong> This site is a work in progress. All logos, brands, trademarks, and intellectual property displayed belong to their respective owners.
+            <br />This site has no affiliation with or endorsement from any of these entities.
+          </p>
+        </div>
+
+        <!-- Copyright -->
+        <div class="pt-4 text-center">
           <p class="text-gray-500 dark:text-gray-400 text-sm">
             © {{ new Date().getFullYear() }} Whenext. All rights reserved.
           </p>
