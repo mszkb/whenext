@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Analytics />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
@@ -7,6 +8,8 @@
 </template>
 
 <script setup>
+import { Analytics } from '@vercel/analytics/nuxt'
+
 // Global SEO and Schema.org setup
 useHead({
   htmlAttrs: {
