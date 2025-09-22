@@ -180,6 +180,9 @@
 </template>
 
 <script setup lang="ts">
+import { useRuntimeConfig } from 'nuxt/app';
+import { ref, computed, watch } from 'vue';
+
 interface Props {
   category?: 'alle' | 'tech' | 'gaming' | 'popkultur' | 'finanzen' | 'entertainment' | 'AI' | 'streaming' | 'e-sports'
   compact?: boolean

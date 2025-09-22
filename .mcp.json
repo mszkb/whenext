@@ -1,0 +1,16 @@
+{
+  "globalShortcut": "Shift+Cmd+C",
+  "mcpServers": {
+    "linear-ccjhqb-91": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.composio.dev/partner/composio/linear/mcp?customerId=96575b7d-6d0a-480b-ac6d-add21b719e57&agent=claude"
+      ],
+      "env": {
+        "npm_config_yes": "true"
+      }
+    }
+  }
+}
